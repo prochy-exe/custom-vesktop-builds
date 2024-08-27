@@ -1,0 +1,95 @@
+name: Build Vesktop
+
+on:
+    workflow_dispatch:
+
+permissions:                # Job-level permissions configuration starts here
+    contents: write           # 'write' access to repository contents
+
+jobs:
+    
+    build-vesktop-linux:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                repository: "PolisanTheEasyNick/Vesktop"
+                ref: "tray-icon"
+
+            - uses: actions/checkout@v4
+              with:
+                path: "custom"
+
+            - name: Patch vesktop repo
+              run: |
+                  git apply --verbose custom/patches/vesktop.patch
+
+            - name: Install dependencies
+              uses: pnpm/action-setup@v4 # Install pnpm using packageManager key in package.json
+              with:
+                run_install: |
+                    args: ["--frozen-lockfile"]
+
+            - name: Use Node.js 20
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: "pnpm"
+
+            - name: Build platform packages
+              run: pnpm package --publish=never
+
+            - name: Install bsdtar
+              run: sudo apt-get install -y libarchive-tools
+
+            - name: Build pacman package
+              run: pnpm package --linux pacman --publish=never
+
+            - name: Create release
+              uses: ncipollo/release-action@v1.14.0
+              with:
+                allowUpdates: true
+                name: latest
+                removeArtifacts: true
+                artifacts: dist/vesktop*,dist/Vesktop
+
+    build-vesktop-windows:
+        runs-on: windows-latest
+        needs: build-vesktop-linux
+
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                repository: "PolisanTheEasyNick/Vesktop"
+                ref: "tray-icon"
+
+            - uses: actions/checkout@v4
+              with:
+                path: "custom"
+
+            - name: Patch vesktop repo
+              run: |
+                  git apply --verbose custom/patches/vesktop.patch
+
+            - name: Install dependencies
+              uses: pnpm/action-setup@v4 # Install pnpm using packageManager key in package.json
+              with:
+                run_install: |
+                    args: ["--frozen-lockfile"]
+
+            - name: Use Node.js 20
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: "pnpm"
+
+            - name: Build platform packages
+              run: pnpm package --publish=never
+
+            - name: Create release
+              uses: ncipollo/release-action@v1.14.0
+              with:
+                  allowUpdates: true
+                  name: latest
+                  artifacts: dist/vesktop*,dist/Vesktop*

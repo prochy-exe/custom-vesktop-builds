@@ -1,0 +1,25 @@
+From 911127e32b7b2f34afed8fd466fb00f20252f539 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Dominik=20Proch=C3=A1zka?= <dominikprochazka100@gmail.com>
+Date: Tue, 27 Aug 2024 08:57:44 +0200
+Subject: [PATCH] Change vencord remote
+
+---
+ src/main/utils/vencordLoader.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/main/utils/vencordLoader.ts b/src/main/utils/vencordLoader.ts
+index c0bac6a..fffff30 100644
+--- a/src/main/utils/vencordLoader.ts
++++ b/src/main/utils/vencordLoader.ts
+@@ -44,7 +44,7 @@ export async function githubGet(endpoint: string) {
+ }
+ 
+ export async function downloadVencordFiles() {
+-    const release = await githubGet("/repos/Vendicated/Vencord/releases/latest");
++    const release = await githubGet("/repos/prochy-exe/custom-vencord-builds/releases/latest");
+ 
+     const { assets }: ReleaseData = await release.json();
+ 
+-- 
+2.45.2
+
